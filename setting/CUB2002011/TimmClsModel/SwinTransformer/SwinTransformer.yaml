@@ -1,0 +1,91 @@
+datasetSetting:
+  method: UniversalDatasetMethod
+  parameter: 
+    name: CUB2002011
+    infoLoaderList:
+      - setName: trainset
+        name: loadClsImageInfo
+        parameter:
+          imagePath: dataprocess/CUB2002011/images/train
+      - setName: validset
+        name: loadClsImageInfo
+        parameter:
+          imagePath: dataprocess/CUB2002011/images/val
+      - name: loadClsCategoryList
+        parameter:
+          path: dataprocess/CUB2002011/images/train
+    datasetList:
+      - setName: trainset
+        name: ImageDataset
+        parameter:
+          imageSize: [448,448]
+          cropSize: [384,384]
+      - setName: trainset
+        name: LabelDataset
+      - setName: validset
+        name: ImageDataset
+        parameter:
+          imageSize: [448,448]
+          cropSize: [384,384]
+      - setName: validset
+        name: LabelDataset
+modelSetting: 
+  name: TimmClsModel
+  parameter:
+    backbone: swin_large_patch4_window12_384_in22k
+    hookLayer:
+      name: norm
+      inFeatures: 1536
+      channelMean: true
+    pretrained: true
+optimizerSetting: 
+  name: SGD
+  # name: RAdam
+  parameter:
+    lr: 0.005
+    # momentum: 0.9
+    weight_decay: 0.00001
+lossSetting : 
+  method: CrossEntropyLoss
+  parameter: {}
+trainSetting: 
+  method: SupervisedLearning
+  metrics: [AccuracyCls]
+  metricsParameter: []
+  decayMethod:
+    name: CosineDecay
+  loader: 
+    batch_size: 4
+    num_workers: 4
+    shuffle: true
+validSetting : 
+  metrics: [AccuracyCls]
+  metricsParameter: []
+  interval: 5
+  loader: 
+    batch_size: 8
+    num_workers: 4
+    shuffle: false
+saveMethod:
+  setName: valid
+  calName: AccuracyCls
+  minimize: false
+testSetting:
+    method: SupervisedTest
+    loader: 
+        batch_size: 8
+        num_workers: 4
+        shuffle: false
+evaluateSetting:
+    method:
+    - ClassificationEvaluate
+    setName: validset 
+    methodParameter:
+    - cam: 
+        name: GradCam 
+        layers: 
+            - backbone.layers.2
+        reshape:
+          - 12
+          - 12
+epochs: 50

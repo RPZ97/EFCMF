@@ -1,0 +1,12 @@
+*.pyc
+dataprocess/
+dataprocess
+/log
+/log2
+.vscode/
+data/
+dataProcess/
+statisticsResult/
+/chart
+statisticsResult.csv
+data

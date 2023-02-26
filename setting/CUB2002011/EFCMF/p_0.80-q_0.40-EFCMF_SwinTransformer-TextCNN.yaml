@@ -1,0 +1,153 @@
+datasetSetting:
+  method: UniversalDatasetMethod
+  parameter:
+    collateFn:
+    - textCollateFn
+    - labelCollateFn
+    - imageCollateFn
+    datasetList:
+    - name: ImageDataset
+      parameter:
+        cropSize:
+        - 384
+        - 384
+        imageSize:
+        - 448
+        - 448
+      setName: trainset
+    - name: TextDataset
+      setName: trainset
+    - name: LabelDataset
+      setName: trainset
+    - name: ImageDataset
+      parameter:
+        cropSize:
+        - 384
+        - 384
+        imageSize:
+        - 448
+        - 448
+      setName: validset
+    - name: TextDataset
+      setName: validset
+    - name: LabelDataset
+      setName: validset
+    infoLoaderList:
+    - name: loadClsImageInfo
+      parameter:
+        imagePath: dataprocess/CUB2002011/images/train
+      setName: trainset
+    - name: loadClsTextInfo
+      parameter:
+        textPath: dataprocess/CUB2002011/textClean/train
+      setName: trainset
+    - name: loadClsImageInfo
+      parameter:
+        imagePath: dataprocess/CUB2002011/images/val
+      setName: validset
+    - name: loadClsTextInfo
+      parameter:
+        textPath: dataprocess/CUB2002011/textClean/val
+      setName: validset
+    - name: loadClsCategoryList
+      parameter:
+        path: dataprocess/CUB2002011/images/train
+    - name: loadTextEncodeDict
+      parameter:
+        pathList:
+        - dataprocess/CUB2002011/textClean/train
+        - dataprocess/CUB2002011/textClean/val
+    name: CUB2002011
+epochs: 50
+evaluateSetting:
+  method:
+  - ClassificationEvaluate
+  - ClsAdvExamplesEvaluate
+  - ClsAdvExamplesEvaluate
+  - ClsAdvExamplesEvaluate
+  - ClsAdvExamplesEvaluate
+  methodParameter:
+  - {}
+  - advExamplesParameter:
+      name: FGSM
+      parameter:
+        eps: 0.014
+  - advExamplesParameter:
+      name: BIM
+      parameter:
+        alpha: 0.00392
+        eps: 0.01568
+        steps: 0
+  - advExamplesParameter:
+      name: PGD
+      parameter:
+        alpha: 0.00784
+        eps: 0.03
+        steps: 10
+  - advExamplesParameter:
+      name: CW
+      parameter:
+        c: 0.0001
+        kappa: 0
+        lr: 0.1
+        steps: 100
+  setName: validset
+lossSetting:
+  method: CrossEntropyLoss
+  parameter: {}
+modelSetting:
+  name: EFCMF
+  parameter:
+    dropFeature: true
+    languageParameter:
+      featureLayer: pool
+      inFeatures: 128
+      name: TextCNN
+    p: 0.8
+    q: 0.4
+    visionParameter:
+      featureLayer: fc.0
+      inFeatures: 1536
+      name: TimmClsModel
+      parameter:
+        backbone: swin_large_patch4_window12_384_in22k
+        hookLayer:
+          channelMean: true
+          inFeatures: 1536
+          name: norm
+        pretrained: true
+optimizerSetting:
+  name: SGD
+  parameter:
+    lr: 0.005
+    weight_decay: 1.0e-05
+saveMethod:
+  calName: AccuracyCls
+  minimize: false
+  setName: valid
+testSetting:
+  loader:
+    batch_size: 8
+    num_workers: 4
+    shuffle: false
+  method: SupervisedTest
+trainSetting:
+  decayMethod:
+    name: CosineDecay
+  loader:
+    batch_size: 4
+    num_workers: 4
+    shuffle: true
+  method: SupervisedLearning
+  metrics:
+  - AccuracyCls
+  metricsParameter: []
+validSetting:
+  interval: 5
+  loader:
+    batch_size: 8
+    num_workers: 4
+    shuffle: false
+  metrics:
+  - AccuracyCls
+  metricsParameter: []

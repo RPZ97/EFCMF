@@ -1,0 +1,7 @@
+
+- program: python
+  name: utils/datasetGenerate/Flower102/getImageDataset.py
+  parameter: {}
+- program: python
+  name: utils/datasetGenerate/Flower102/getTextDataset.py
+  parameter: {}

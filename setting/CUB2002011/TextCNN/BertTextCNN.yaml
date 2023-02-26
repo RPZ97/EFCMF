@@ -1,0 +1,84 @@
+datasetSetting:
+  method: UniversalDatasetMethod
+  parameter: 
+    name: CUB2002011
+    infoLoaderList:
+      - setName: trainset
+        name: loadClsTextInfo
+        parameter:
+          textPath: dataprocess/CUB2002011/textClean/train
+      - setName: validset
+        name: loadClsTextInfo
+        parameter:
+          textPath: dataprocess/CUB2002011/textClean/val
+      - name: loadClsCategoryList
+        parameter:
+          path: dataprocess/CUB2002011/textClean/train
+      - name: loadTextEncodeDict
+        parameter:
+          pathList: 
+            - dataprocess/CUB2002011/textClean/train
+            - dataprocess/CUB2002011/textClean/val
+    datasetList:
+      - setName: trainset
+        name: BertTextDataset
+      - setName: trainset
+        name: LabelDataset
+      - setName: validset
+        name: BertTextDataset
+      - setName: validset
+        name: LabelDataset
+    collateFn: 
+      - textCollateFn
+      - labelCollateFn
+modelSetting: 
+  name: TextCNN
+  parameter: 
+    embeddingDim: 50
+    # embeddingWeight: data/embedding/glove.6B/glove.6B.50d.txt
+    dropout: 0.5
+    numFilters: 128
+    filterSizeList: [2,3,4,5,5]
+    bert: bert-base-cased
+    freezeEmbedding: true
+optimizerSetting: 
+  # name: SGD
+  name: RAdam
+  parameter:
+    lr: 0.01
+    weight_decay: 0.0001
+lossSetting : 
+  method: CrossEntropyLoss
+  parameter: {}
+trainSetting: 
+  method: SupervisedLearning
+  metrics: [AccuracyCls]
+  metricsParameter: []
+  loader: 
+    batch_size: 32
+    num_workers: 1
+    shuffle: true
+validSetting : 
+  metrics: [AccuracyCls]
+  metricsParameter: []
+  interval: 5
+  loader: 
+    batch_size: 32
+    num_workers: 1
+    shuffle: false
+saveMethod:
+  setName: valid
+  calName: AccuracyCls
+  minimize: false
+epochs: 50
+
+evaluateSetting:
+  method:
+  - ClassificationEvaluate
+  setName: validset 
+testSetting:
+  method: SupervisedTest
+  loader: 
+    batch_size: 32
+    num_workers: 4
+    shuffle: false

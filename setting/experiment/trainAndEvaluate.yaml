@@ -1,0 +1,9 @@
+- program: python
+  name: main.py
+  parameter: 
+    setting: setting/Flower102/EFCMF/p_0.80-q_0.40-EFCMF_SwinTransformer-TextCNN.yaml
+- program: python 
+  name: utils/testClsModel.py
+  parameter:
+    logPathList:
+      - log
